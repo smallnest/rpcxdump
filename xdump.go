@@ -61,7 +61,7 @@ func main() {
 }
 
 func dump(host, port string) {
-	var filter = "tcp and dst port " + port + " and dst host " + host
+	var filter = "tcp and port " + port + " and host " + host
 	err := handle.SetBPFFilter(filter)
 	if err != nil {
 		log.Fatalf("failed to set filter: %v", err)
