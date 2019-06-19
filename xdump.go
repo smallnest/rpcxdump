@@ -93,7 +93,7 @@ func dump(host, port string) {
 			toPort = int(tcp.DstPort)
 
 		}
-		key := fmt.Sprintf("%s:%d->%s:%d", fromIP, fromPort, toIP, toPort)
+		key := fmt.Sprintf("%s:%d -> %s:%d", fromIP, fromPort, toIP, toPort)
 		mu.RLock()
 		c := conns[key]
 		mu.RUnlock()

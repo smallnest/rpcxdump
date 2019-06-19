@@ -11,7 +11,7 @@ import (
 
 func output(key string, msg *protocol.Message) {
 	if *withColor {
-		fmt.Printf("%s %s %s\n\n", time.Now().Format("15:04:05.000"), key, renderWithColor(msg))
+		fmt.Printf("%s %s %s\n\n", color.MagentaString(time.Now().Format("15:04:05.000")), key, renderWithColor(msg))
 		return
 	}
 
