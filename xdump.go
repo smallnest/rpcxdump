@@ -93,11 +93,25 @@ func dump(host, port string) {
 			toPort = int(tcp.DstPort)
 
 		}
+		applicationLayer := packet.ApplicationLayer()
+
 		key := fmt.Sprintf("%s:%d -> %s:%d", fromIP, fromPort, toIP, toPort)
 		mu.RLock()
 		c := conns[key]
 		mu.RUnlock()
-		if c == nil {
+
+		if tcpLayer != nil && c != nil {
+			tcp, _ := tcpLayer.(*layers.TCP)
+			if tcp.FIN {
+				mu.Lock()
+				c.Close()
+				delete(conns, key)
+				mu.Unlock()
+				continue
+			}
+		}
+
+		if c == nil && applicationLayer != nil && len(applicationLayer.Payload()) > 0 {
 			c = &connection{
 				key: key,
 				buf: ringbuffer.New(1024 * 1024),
@@ -116,15 +130,6 @@ func dump(host, port string) {
 			go c.Start()
 		}
 
-		if tcpLayer != nil {
-			tcp, _ := tcpLayer.(*layers.TCP)
-			if tcp.FIN {
-				c.Close()
-				continue
-			}
-		}
-
-		applicationLayer := packet.ApplicationLayer()
 		if applicationLayer != nil {
 			c.buf.Write(applicationLayer.Payload())
 		}
