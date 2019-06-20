@@ -112,8 +112,10 @@ func dump(host, port string) {
 			}
 		}
 
-		if c == nil && applicationLayer != nil && len(applicationLayer.Payload()) > 0 &&
-			applicationLayer.Payload()[0] == protocol.MagicNumber() {
+		if c == nil && applicationLayer != nil && len(applicationLayer.Payload()) > 0 {
+			if applicationLayer.Payload()[0] != protocol.MagicNumber() {
+				continue
+			}
 			c = &connection{
 				key: key,
 				buf: ringbuffer.New(1024 * 1024),
