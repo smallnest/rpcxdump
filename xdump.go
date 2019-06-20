@@ -13,6 +13,7 @@ import (
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
 	"github.com/smallnest/ringbuffer"
+	"github.com/smallnest/rpcx/protocol"
 )
 
 var (
@@ -111,7 +112,8 @@ func dump(host, port string) {
 			}
 		}
 
-		if c == nil && applicationLayer != nil && len(applicationLayer.Payload()) > 0 {
+		if c == nil && applicationLayer != nil && len(applicationLayer.Payload()) > 0 &&
+			applicationLayer.Payload()[0] == protocol.MagicNumber() {
 			c = &connection{
 				key: key,
 				buf: ringbuffer.New(1024 * 1024),
