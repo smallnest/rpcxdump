@@ -40,7 +40,7 @@ func main() {
 	}
 	host, port, err := net.SplitHostPort(*captureAddr)
 	if err != nil {
-		log.Fatal("failed to find device for %s: %v", *captureAddr, err)
+		log.Fatalf("failed to find device for %s: %v", *captureAddr, err)
 	}
 
 	if *pcapFile != "" {
@@ -52,7 +52,7 @@ func main() {
 		device, err := findDevice(host)
 		handle, err = pcap.OpenLive(device, 1522, false, 30*time.Second)
 		if err != nil {
-			log.Fatal("failed to open live for %s: %v", device, err)
+			log.Fatalf("failed to open live for %s: %v", device, err)
 		}
 	}
 	defer handle.Close()
