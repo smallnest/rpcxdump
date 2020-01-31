@@ -154,10 +154,7 @@ func findDeviceByPcap(ip string) (string, error) {
 	}
 
 	for _, iface := range ifaces {
-		fmt.Println(iface.Name, iface.Description, iface.Flags)
-
 		for _, addr := range iface.Addresses {
-			fmt.Println("ip:", addr.IP.String())
 			if addr.IP.String() == ip {
 				return iface.Name, nil
 			}
