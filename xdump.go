@@ -56,7 +56,23 @@ func main() {
 
 		log.Printf("find device %s for %s", device, host)
 
-		handle, err = pcap.OpenLive(device, 1522, false, 30*time.Second)
+		inactive, err := pcap.NewInactiveHandle(device)
+		if err != nil {
+			log.Fatalf("could not create: %v", err)
+		}
+		defer inactive.CleanUp()
+		if err = inactive.SetSnapLen(1522); err != nil {
+			log.Fatalf("could not set snap length: %v", err)
+		} else if err = inactive.SetPromisc(false); err != nil {
+			log.Fatalf("could not set promisc mode: %v", err)
+		} else if err = inactive.SetTimeout(30 * time.Second); err != nil {
+			log.Fatalf("could not set timeout: %v", err)
+		}
+
+		if handle, err = inactive.Activate(); err != nil {
+			log.Fatal("PCAP Activate error:", err)
+		}
+		//handle, err = pcap.OpenLive(device, 1522, false, 30*time.Second)
 		if err != nil {
 			log.Fatalf("failed to open live for %s: %v", device, err)
 		}
@@ -75,6 +91,7 @@ func dump(host, port string) {
 	}
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	for packet := range packetSource.Packets() {
+		log.Println(packet)
 		var fromIP, toIP string
 		var fromPort, toPort int
 		ipLayer := packet.Layer(layers.LayerTypeIPv4)
