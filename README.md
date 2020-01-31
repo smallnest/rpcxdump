@@ -19,9 +19,11 @@ or
 go run github.com/smallnest/rpcxdump
 ```
 
-**Notice**
+## Notice
 
-For windows users, you must install [winpcap](https://www.winpcap.org/install/) or nmap or wireshark for using wpcap.dll.
-And you can't capture loopback address such as 127.0.0.1 in Windows.
+~~For windows users, you must install [winpcap](https://www.winpcap.org/install/) or nmap or wireshark for using wpcap.dll.
+And you can't capture loopback address such as 127.0.0.1 in Windows.~~
+
+It looks pcap can't capture the local packets in Windows
 
 ![](snapshoot.png)

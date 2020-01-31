@@ -77,7 +77,6 @@ func dump(host, port string) {
 	for packet := range packetSource.Packets() {
 		var fromIP, toIP string
 		var fromPort, toPort int
-
 		ipLayer := packet.Layer(layers.LayerTypeIPv4)
 		if ipLayer != nil {
 			ip, _ := ipLayer.(*layers.IPv4)
@@ -140,7 +139,7 @@ func dump(host, port string) {
 			go c.Start()
 		}
 
-		if applicationLayer != nil {
+		if applicationLayer != nil && len(applicationLayer.Payload()) > 0 {
 			c.buf.Write(applicationLayer.Payload())
 		}
 	}
