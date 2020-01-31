@@ -13,7 +13,6 @@ import (
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
 	"github.com/smallnest/ringbuffer"
-	"github.com/smallnest/rpcx/protocol"
 )
 
 var (
@@ -133,30 +132,31 @@ func dump(host, port string) {
 			}
 		}
 
-		if c == nil && applicationLayer != nil && len(applicationLayer.Payload()) > 0 {
-			if applicationLayer.Payload()[0] != protocol.MagicNumber() {
-				continue
-			}
-			c = &connection{
-				key: key,
-				buf: ringbuffer.New(1024 * 1024),
-				closeCallback: func(err error) {
+		if applicationLayer != nil {
+			data := applicationLayer.Payload()
+			if len(data) > 0 {
+				if c == nil {
+					c = &connection{
+						key: key,
+						buf: ringbuffer.New(1024 * 1024),
+						closeCallback: func(err error) {
+							mu.Lock()
+							c.Close()
+							delete(conns, key)
+							mu.Unlock()
+						},
+						parseCallBack: output,
+						done:          make(chan struct{}),
+					}
 					mu.Lock()
-					c.Close()
-					delete(conns, key)
+					conns[key] = c
 					mu.Unlock()
-				},
-				parseCallBack: output,
-				done:          make(chan struct{}),
-			}
-			mu.Lock()
-			conns[key] = c
-			mu.Unlock()
-			go c.Start()
-		}
+					go c.Start()
+				}
 
-		if applicationLayer != nil && len(applicationLayer.Payload()) > 0 {
-			c.buf.Write(applicationLayer.Payload())
+				c.buf.Write(data)
+			}
+
 		}
 	}
 }
