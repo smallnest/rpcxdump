@@ -91,7 +91,6 @@ func dump(host, port string) {
 	}
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	for packet := range packetSource.Packets() {
-		log.Println(packet)
 		var fromIP, toIP string
 		var fromPort, toPort int
 		ipLayer := packet.Layer(layers.LayerTypeIPv4)
