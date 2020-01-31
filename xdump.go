@@ -49,7 +49,13 @@ func main() {
 			log.Fatal(err)
 		}
 	} else {
-		device, err := findDevice(host)
+		device, err := findDeviceByPcap(host)
+		if err != nil {
+			log.Fatalf("failed to find device for %s: %v", host, err)
+		}
+
+		log.Printf("find device %s for %s", device, host)
+
 		handle, err = pcap.OpenLive(device, 1522, false, 30*time.Second)
 		if err != nil {
 			log.Fatalf("failed to open live for %s: %v", device, err)
@@ -139,6 +145,28 @@ func dump(host, port string) {
 		}
 	}
 }
+
+// you can't capture windows loopback address such as 127.0.0.1
+func findDeviceByPcap(ip string) (string, error) {
+	ifaces, err := pcap.FindAllDevs()
+	if err != nil {
+		return "", err
+	}
+
+	for _, iface := range ifaces {
+		fmt.Println(iface.Name, iface.Description, iface.Flags)
+
+		for _, addr := range iface.Addresses {
+			fmt.Println("ip:", addr.IP.String())
+			if addr.IP.String() == ip {
+				return iface.Name, nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("device for %s not found", ip)
+}
+
 func findDevice(ip string) (string, error) {
 	ifaces, err := net.Interfaces()
 	if err != nil {
