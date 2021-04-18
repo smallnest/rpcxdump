@@ -6,7 +6,10 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/google/gopacket"
@@ -79,7 +82,12 @@ func main() {
 	defer handle.Close()
 
 	conns = make(map[string]*connection)
-	dump(host, port)
+	go dump(host, port)
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
+	<-sigs
+	fmt.Println("exited")
 }
 
 func dump(host, port string) {

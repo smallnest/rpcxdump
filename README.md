@@ -19,6 +19,9 @@ or
 go run github.com/smallnest/rpcxdump
 ```
 
+
+If you use win10, you should install [npcap](https://nmap.org/npcap/#download) for pcap.dll, the [win10pcap](http://www.win10pcap.org/) can not capture loopback device such as 127.0.0.1.
+
 ## Notice
 
 ~~For windows users, you must install [winpcap](https://www.winpcap.org/install/) or nmap or wireshark for using wpcap.dll.
